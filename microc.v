@@ -1,5 +1,7 @@
 module microc(output wire [5:0] Opcode, output wire zero, input wire clk, reset, s_inc, s_inm, we, wez, input wire [2:0] ALUOp);
 //Microcontrolador sin memoria de datos de un solo ciclo
+    Opcode = Datum[15:10];
+
 //mux_1
     reg [9:0] s_mp; //cable que sale de mux_1 y entra a PC
     reg [9:0] dir_salto = Datum[9:0];
@@ -22,10 +24,10 @@ module microc(output wire [5:0] Opcode, output wire zero, input wire clk, reset,
 
 //Banco de registros
     reg [3:0] RA2 = Datum[7:4];
-    reg [7:0] s_alu; //cable que sale del ALU
+    reg [7:0] WD3;
     reg [7:0] RD1;
     reg [7:0] RD2;
-    regfile regfile_1(RD1, RD2, clk, we3, s_mb, RA2, WA3, s_alu);
+    regfile regfile_1(RD1, RD2, clk, we, s_mb, RA2, WA3, WD3);
 
 //mux_3
     reg [7:0] s_ma; //salida del mux_3 al alu
@@ -33,8 +35,10 @@ module microc(output wire [5:0] Opcode, output wire zero, input wire clk, reset,
     mux2 #(8) mux_3(s_ma, RD2, Inm, s_inm);
 
 //ALU
-    reg zero;
-    alu alu_1(s_alu, zero, RD1, s_ma, ALUOp);
+    reg zALU;
+    alu alu_1(WD3, zALU, RD1, s_ma, ALUOp);
 
-
+//flipflop
+    ffd ffz(clk, reset, zALU, wez, zero);
+    
 endmodule
