@@ -4,20 +4,21 @@ module microc_tb;
 
 //declaracion de señales
 wire[5:0] test_Opcode;
-wire test_zero
-reg test_clk, test_reset, test_s_inc, test_s_inm, test_we, test_wez;
+wire test_zero;
+reg test_clk = 0;
+reg test_reset;
+reg test_s_inc;
+reg test_s_inm;
+reg test_we;
+reg test_wez;
 reg[2:0] test_ALUOp;
 
 //instancia del modulo a testear
 microc microc_1(test_Opcode, test_zero, test_clk, test_reset, test_s_inc, test_s_imn, test_we, test_wez, test_ALUOp);
 
 initial
-  always @(test_clk)
   begin // Genera un reloj 
-      clk = 1;
-      # 20;
-      clk = 0;
-      # 20;
+    always #20 test_clk = ~test_clk;
   end
 
 initial
@@ -39,7 +40,7 @@ initial
     test_s_inc = 1;
     test_s_inm = 0;
     test_we = 1;
-    test_wez = 1
+    test_wez = 1;
     test_Opcode = 4'b0000; // OpCode para LI
 
     #40; // LI #3, R4
