@@ -5,7 +5,7 @@ module microc_tb;
 //declaracion de señales
 wire[5:0] test_Opcode;
 wire test_zero
-reg test_clk, test_reset, test_s_inc, test_s_imn, test_we, test_wez;
+reg test_clk, test_reset, test_s_inc, test_s_inm, test_we, test_wez;
 reg[2:0] test_ALUOp;
 
 //instancia del modulo a testear
@@ -22,6 +22,10 @@ initial
 
 initial
   begin
+    $monitor("tiempo=%0d reset=%b s_inc=%b s_inm=%b we=%b wez=%b =%b Opcode=%b zero=%b", $time, test_reset, test_s_inc, test_s_inm, test_we, test_wez, test_Opcode, test_zero);
+    $dumpfile("microc_tb.vcd");
+    $dumpvars;
+    
     // Inicializa las señales
     test_reset = 1;
     test_s_inc = 0;
