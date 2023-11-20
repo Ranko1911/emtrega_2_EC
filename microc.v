@@ -40,5 +40,8 @@ module microc(output wire [5:0] Opcode, output wire zero, input wire clk, reset,
 
 //flipflop
     ffd ffz(clk, reset, zALU, wez, zero);
-    
+
+//PC
+    registro #(10) registro_1(s_pc, clk, reset, s_mp);
+     
 endmodule
