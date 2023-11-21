@@ -5,7 +5,7 @@ module microc_tb;
 //declaracion de señales
 wire[5:0] test_Opcode;
 wire test_zero;
-reg test_clk = 0;
+reg test_clk;
 reg test_reset;
 reg test_s_inc;
 reg test_s_inm;
@@ -14,84 +14,168 @@ reg test_wez;
 reg[2:0] test_ALUOp;
 
 //instancia del modulo a testear
-microc microc_1(test_Opcode, test_zero, test_clk, test_reset, test_s_inc, test_s_imn, test_we, test_wez, test_ALUOp);
+microc microc_1(test_Opcode, test_zero, test_clk, test_reset, test_s_inc, test_s_inm, test_we, test_wez, test_ALUOp);
+
+  always
+  #20 test_clk = ~test_clk;
 
 initial
-  begin // Genera un reloj 
-    always #20 test_clk = ~test_clk;
+  begin
+    test_clk = 1;
+    test_reset = 1;
+    # 10;
+    test_reset = 0;
   end
 
 initial
   begin
-    $monitor("tiempo=%0d reset=%b s_inc=%b s_inm=%b we=%b wez=%b =%b Opcode=%b zero=%b", $time, test_reset, test_s_inc, test_s_inm, test_we, test_wez, test_Opcode, test_zero);
     $dumpfile("microc_tb.vcd");
     $dumpvars;
-    
-    // Inicializa las señales
-    test_reset = 1;
-    test_s_inc = 0;
-    test_s_inm = 0;
-    test_we = 0;
-    test_ALUOp = 3'b000;
-    #20 test_reset = 0;
-
+    # 20;
     // Test de operaciones
-    // LI #1, R1
+    // LI #3, R1
+    test_s_inc = 1; // Señal de incremento desactivada
+    test_s_inm = 1; // Señal de inmediato activada
+    test_we = 1;  // permiso de escritura
+    test_wez = 1; // permiso de escritura en el registro zero
+    test_ALUOp = 3'b000; //operacion del alu =
+
+    #40; // MOV R1, R2
     test_s_inc = 1;
     test_s_inm = 0;
     test_we = 1;
     test_wez = 1;
-    test_Opcode = 4'b0000; // OpCode para LI
+    test_ALUOp = 3'b000;
 
-    #40; // LI #3, R4
-    test_s_inc = 1;
-    test_s_inm = 0;
-    test_we = 1;
-    test_wez = 1;
-    test_Opcode = 4'b0000; // OpCode para LI
-
-    #40; // MOV R4, R5
+    #40; // SBI #2, R1
     test_s_inc = 1;
     test_s_inm = 1;
     test_we = 1;
     test_wez = 1;
-    test_Opcode = 4'b1010; // OpCode para MOV
+    test_ALUOp = 3'b011; // OpCode para SBI
 
-    #40; // CC: ADD R1, R4, R7
+    #40; // ADI #4, R3
+    test_s_inc = 1;
+    test_s_inm = 1;
+    test_we = 1;
+    test_wez = 1;
+    test_ALUOp = 3'b010; // OpCode para ADI
+
+    #40; // CHECK: SUB R3 R1 R3
+    test_s_inc = 1;
+    test_s_inm = 0;
+    test_we = 1; // Podría ser 1 si se debe escribir la dirección en el registro
+    test_wez = 1;
+    test_ALUOp = 3'b011; // OpCode para SUB
+
+    #40; // JZ CLOSE
+    test_s_inc = ~test_zero;
+    test_s_inm = 0;
+    test_we = 0;
+    test_wez = 0;
+    test_ALUOp = 3'b000; // OpCode para JZ, no se si está bien
+
+    #40; // SUB R2 R1 R2
     test_s_inc = 1;
     test_s_inm = 0;
     test_we = 1;
     test_wez = 1;
-    test_Opcode = 4'b0111; // OpCode para ADD
+    test_ALUOp = 3'b011; // OpCode para SUB
 
-    #40; // JNZ COSAS
-    test_s_inc = 1;
+    #40; // J CHECK
+    test_s_inc = 0; //siempre salta a CHECK
     test_s_inm = 0;
     test_we = 0; // Podría ser 1 si se debe escribir la dirección en el registro
     test_wez = 0;
-    test_Opcode = 4'b0110; // OpCode para JNZ
+    test_ALUOp = 3'b010; // OpCode para J, nose sie sta bien
 
-    #40; // SUB R7, R1, R7
+/////
+    #40; // CHECK: SUB R3 R1 R3
+    test_s_inc = 1;
+    test_s_inm = 0;
+    test_we = 1; // Podría ser 1 si se debe escribir la dirección en el registro
+    test_wez = 1;
+    test_ALUOp = 3'b011; // OpCode para SUB
+
+    #40; // JZ CLOSE
+    test_s_inc = ~test_zero;
+    test_s_inm = 0;
+    test_we = 0;
+    test_wez = 0;
+    test_ALUOp = 3'b000; // OpCode para JZ, no se si está bien
+
+    #40; // SUB R2 R1 R2
     test_s_inc = 1;
     test_s_inm = 0;
     test_we = 1;
     test_wez = 1;
-    test_Opcode = 4'b1000; // OpCode para SUB
+    test_ALUOp = 3'b011; // OpCode para SUB
 
-    #40; // COSAS: ADD R3, R4, R8
-    test_s_inc = 1;
-    test_s_inm = 0;
-    test_we = 1;
-    test_wez = 1;
-    test_Opcode = 4'b0111; // OpCode para ADD
-
-    #40; // J CC
-    test_s_inc = 1;
+    #40; // J CHECK
+    test_s_inc = 0; //siempre salta a CHECK
     test_s_inm = 0;
     test_we = 0; // Podría ser 1 si se debe escribir la dirección en el registro
     test_wez = 0;
-    test_Opcode = 4'b0100; // OpCode para J
+    test_ALUOp = 3'b010; // OpCode para J, nose sie sta bien
+/////
+    #40; // CHECK: SUB R3 R1 R3
+    test_s_inc = 1;
+    test_s_inm = 0;
+    test_we = 1; // Podría ser 1 si se debe escribir la dirección en el registro
+    test_wez = 1;
+    test_ALUOp = 3'b011; // OpCode para SUB
 
+    #40; // JZ CLOSE
+    test_s_inc = ~test_zero;
+    test_s_inm = 0;
+    test_we = 0;
+    test_wez = 0;
+    test_ALUOp = 3'b000; // OpCode para JZ, no se si está bien
+
+    #40; // SUB R2 R1 R2
+    test_s_inc = 1;
+    test_s_inm = 0;
+    test_we = 1;
+    test_wez = 1;
+    test_ALUOp = 3'b011; // OpCode para SUB
+
+    #40; // J CHECK
+    test_s_inc = 0; //siempre salta a CHECK
+    test_s_inm = 0;
+    test_we = 0; // Podría ser 1 si se debe escribir la dirección en el registro
+    test_wez = 0;
+    test_ALUOp = 3'b010; // OpCode para J, nose sie sta bien
+/////
+    #40; // CHECK: SUB R3 R1 R3
+    test_s_inc = 1;
+    test_s_inm = 0;
+    test_we = 1; // Podría ser 1 si se debe escribir la dirección en el registro
+    test_wez = 1;
+    test_ALUOp = 3'b011; // OpCode para SUB
+
+    #40; // JZ CLOSE
+    test_s_inc = ~test_zero;
+    test_s_inm = 0;
+    test_we = 0;
+    test_wez = 0;
+    test_ALUOp = 3'b000; // OpCode para JZ, no se si está bien
+////
+
+    #40; // CLOSE: ADD R3 R3 R4
+    test_s_inc = 1;
+    test_s_inm = 0;
+    test_we = 1;
+    test_wez = 1;
+    test_ALUOp = 3'b010; // OpCode para ADD
+
+    #40; // FINISH: END: J END
+    test_s_inc = 0;
+    test_s_inm = 0;
+    test_we = 0; 
+    test_wez = 0;
+    test_ALUOp = 3'b010; // OpCode para J
+
+    #40;
       $finish;
   end
 

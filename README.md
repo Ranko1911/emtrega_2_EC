@@ -1,14 +1,16 @@
 # Segunda Practica de Estructuras de Computadores
+
 Creacion de una CPU "Simple"
 
 ## Autores
+
 Ancor Gonzalez Carballo && Ángel Vladislav Alonso Yemelyantseva
 
 ## Pasos para trabajar con verilog
-iverilog -o ha_v1.vvp ha_v1_tb.v ha_v1.v
-./ha_v1.vvp 
-gtkwave ha_v1_tb.vcd &
 
+iverilog -o ha_v1.vvp ha_v1_tb.v ha_v1.v
+./ha_v1.vvp
+gtkwave ha_v1_tb.vcd &
 
 ## Descripcion del trabajo
 
@@ -17,6 +19,7 @@ a la hora de asignar valores a las entradas no sabemos si lo estamos haciendo
 de la forma que se nos pide.
 
 ## Descripcion de la CPU
+
 **Instrucción de operación aritmética o lógica:**
 
 1 - Instrucción de operación aritmética o lógica:
@@ -39,8 +42,6 @@ de la forma que se nos pide.
   La señal s_inc debe tener el valor 1 para activar el incremento del PC.
   Estas instrucciones deben afectar al flag de zero (ZF), que generalmente indica si el resultado de una operación es cero.
   Se deben generar señales de control específicas para escribir en el banco de registros y afectar al ZF según la operación.
-
-
 ______________________
 **Instrucción de operación aritmética o lógica con constante inmediata:**
 
@@ -67,7 +68,6 @@ ______________________
   Se debe incrementar el Contador de Programa (PC).
   Permitir escrituras en el banco de registros.
   Permitir escrituras en la bandera de cero (ZF), que generalmente indica si el resultado de una operación es cero.
-
 ______________________
 **Instrucciones de saltos (absolutos)**
 
